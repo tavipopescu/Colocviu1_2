@@ -29,5 +29,7 @@ public class Colocviu1_2SecondaryActivity extends AppCompatActivity {
 
             setResult(result);
         }
+
+        finish();
     }
 }

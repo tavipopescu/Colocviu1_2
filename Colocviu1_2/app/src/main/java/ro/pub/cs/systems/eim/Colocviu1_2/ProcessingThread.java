@@ -12,13 +12,12 @@ public class ProcessingThread extends Thread {
 
     public ProcessingThread(Context context, int result) {
         this.context = context;
-
         this.result = result;
     }
 
     @Override
     public void run() {
-        Log.d("TAG", "Thread has started! PID: ");
+        Log.d("TAG", "Thread has started!");
         sleep();
         sendMessage();
     }

@@ -47,8 +47,6 @@ public class Colocviu1_2MainActivity extends AppCompatActivity {
 
                 }
             }
-
-
         }
     }
 
@@ -72,9 +70,6 @@ public class Colocviu1_2MainActivity extends AppCompatActivity {
             if (result > 10 && serviceStatus != Constants.SERVICE_STARTED) {
                 serviceIntent = new Intent(getApplicationContext(), Colocviu1_2Service.class);
                 serviceStatus = Constants.SERVICE_STARTED;
-            }
-
-            if (result > 10) {
                 serviceIntent.putExtra(Constants.SEND_RESULT, result);
 
                 getApplicationContext().startService(serviceIntent);
@@ -126,11 +121,7 @@ public class Colocviu1_2MainActivity extends AppCompatActivity {
             if (result > 10 && serviceStatus != Constants.SERVICE_STARTED) {
                 serviceIntent = new Intent(getApplicationContext(), Colocviu1_2Service.class);
                 serviceStatus = Constants.SERVICE_STARTED;
-            }
-
-            if (result > 10) {
                 serviceIntent.putExtra(Constants.SEND_RESULT, result);
-
                 getApplicationContext().startService(serviceIntent);
             }
         }
