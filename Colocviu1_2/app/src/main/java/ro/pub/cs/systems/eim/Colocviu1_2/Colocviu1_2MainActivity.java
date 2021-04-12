@@ -4,7 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +25,9 @@ public class Colocviu1_2MainActivity extends AppCompatActivity {
 
     private int result = 0;
     private String lastCallAllTermsString = "";
+    private int serviceStatus;
+
+    Intent serviceIntent;
 
     private class AddButtonListener implements View.OnClickListener {
         @Override
@@ -62,10 +68,31 @@ public class Colocviu1_2MainActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(getApplicationContext(), "Computed value stored in activity is: " + result, Toast.LENGTH_LONG).show();
             }
+
+            if (result > 10 && serviceStatus != Constants.SERVICE_STARTED) {
+                serviceIntent = new Intent(getApplicationContext(), Colocviu1_2Service.class);
+                serviceStatus = Constants.SERVICE_STARTED;
+            }
+
+            if (result > 10) {
+                serviceIntent.putExtra(Constants.SEND_RESULT, result);
+
+                getApplicationContext().startService(serviceIntent);
+            }
         }
     }
 
     private ComputeButtonListener computeButtonListener = new ComputeButtonListener();
+
+    private class MessageBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(getApplicationContext(), "Broadcast receiver: " + intent.getStringExtra(Constants.BROADCAST_EXTRA), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private MessageBroadcastReceiver messageBroadcastReceiver = new MessageBroadcastReceiver();
+    private IntentFilter intentFilter = new IntentFilter();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +113,8 @@ public class Colocviu1_2MainActivity extends AppCompatActivity {
                 result = savedInstanceState.getInt(Constants.SAVED_RESULT);
             }
         }
+
+        intentFilter.addAction(Constants.ACTION);
     }
 
     @Override
@@ -94,6 +123,16 @@ public class Colocviu1_2MainActivity extends AppCompatActivity {
         if (requestCode == Constants.REQUEST_CODE) {
             Toast.makeText(this, "Computed value by secondary activity is: " + resultCode, Toast.LENGTH_LONG).show();
             result = resultCode;
+            if (result > 10 && serviceStatus != Constants.SERVICE_STARTED) {
+                serviceIntent = new Intent(getApplicationContext(), Colocviu1_2Service.class);
+                serviceStatus = Constants.SERVICE_STARTED;
+            }
+
+            if (result > 10) {
+                serviceIntent.putExtra(Constants.SEND_RESULT, result);
+
+                getApplicationContext().startService(serviceIntent);
+            }
         }
     }
 
@@ -102,5 +141,24 @@ public class Colocviu1_2MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
 
         outState.putInt(Constants.SAVED_RESULT, result);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Intent intent = new Intent(this, Colocviu1_2Service.class);
+        stopService(intent);
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(messageBroadcastReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        unregisterReceiver(messageBroadcastReceiver);
+        super.onPause();
     }
 }
